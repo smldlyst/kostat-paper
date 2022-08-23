@@ -1374,7 +1374,9 @@ mdis_jt_total <- mdis[which((mdis$재택근무여부=="예") | (mdis$재택근�
 mdis_jt_y <- mdis[which(mdis$재택근무여부=="예"), ]
 mdis_jt_n <- mdis[which(mdis$재택근무여부=="아니오"), ]
 
-satisfaction_df <- mdis_jt_total # jt_y, jt_n
+satisfaction_df <- mdis_jt_total # Phase 1
+satisfaction_df <- mdis_jt_y # Phase 2
+satisfaction_df <- mdis_jt_n # Phase 3
 
 select <- dplyr::select
 satisfaction_df %<>% select(주관적만족감코드, 성취만족도코드, 개인적인간관계만족도코드,
@@ -1426,7 +1428,7 @@ dim(satisfaction_df) # 2040(원격근무 : 예)
 # 사용되지 않은 level 삭제
 satisfaction_df <- as.data.frame(lapply(satisfaction_df, droplevels))
 ################################################################################
-# <EDA>
+# <Explotray Data Analysis> (for Factor Analysis)
 # Transform Categoricatl to Numerical Variable (For Factor Analysis)
 satisfaction_df <- as.data.frame(lapply(satisfaction_df, as.numeric))
 
@@ -1440,22 +1442,20 @@ cortest.bartlett(satis_matrix)
 # 2. Kaiser-Meyer-Olkin factor adequacy
 KMO(satisfaction_df) # 0.9~ : Very Excellent -> 요인분석이 적절함.
 ################################################################################
-
-# <EFA>
+# <Exploratory Factor Analysis>
 y <- satisfaction_df$주관적만족감
 satisfaction_df %<>% select(-주관적만족감)
 
-pc2 <-  principal(satisfaction_df, nfactors = 5, rotate = "varimax")
+pc <-  principal(satisfaction_df, nfactors = 6, rotate = "varimax")
 plot(pc2$values, type = "b") # 고유값을 통한 인자 개수 결정
-pc2
+pc
 # h2는 공통성 값(h^2). 모든변수사용시 공통성=1, 변수개수 줄면 공통성<1
 # u2는 유일성.(각 변수에 대한 (유일한) 변동의 양.= 1-공통성)
 
 # fc <- factanal(satisfaction_df, factors = 5, rotation = "varimax")
-# 
+# 현재 데이터에서 주성분을 이용한 요인분석(pricipal)이 요인분석(factnal) 보다 더 잘 수행됨
 ################################################################################
-
-# <CFA>
+# <Confirmatory Factor Analysis>
 model='
 성취요인 =~ 성취
 관계요인 =~ 개인적인간관계
@@ -1483,11 +1483,11 @@ cfa_df <- as.data.frame(cfa_df)
 str(cfa_df)
 
 ################################################################################
-
 # Create CFA data
 cfa_df$주관적만족감 <- y
 cfa_df$주관적만족감 <- as.factor(ifelse(cfa_df$주관적만족감 >=3, "만족", "불만족"))
 cfa_df$주관적만족감 <- fct_rev(cfa_df$주관적만족감)
-# saveRDS(cfa_df, file="C:/R/kostat-paper/cfa_jt_total.rda")
-
+saveRDS(cfa_df, file="./cfa_jt_total.rda") # Phase 1
+# saveRDS(cfa_df, file="./cfa_jt_y.rda") # Phase 2
+# saveRDS(ca_df, file="./cfa_jt_n.rda") # Phase 3
 ################################################################################
