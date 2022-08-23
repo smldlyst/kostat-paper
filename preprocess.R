@@ -1375,8 +1375,8 @@ mdis_jt_y <- mdis[which(mdis$재택근무여부=="예"), ]
 mdis_jt_n <- mdis[which(mdis$재택근무여부=="아니오"), ]
 
 satisfaction_df <- mdis_jt_total # Phase 1
-satisfaction_df <- mdis_jt_y # Phase 2
-satisfaction_df <- mdis_jt_n # Phase 3
+# satisfaction_df <- mdis_jt_y # Phase 2
+# satisfaction_df <- mdis_jt_n # Phase 3
 
 select <- dplyr::select
 satisfaction_df %<>% select(주관적만족감코드, 성취만족도코드, 개인적인간관계만족도코드,
@@ -1487,7 +1487,7 @@ str(cfa_df)
 cfa_df$주관적만족감 <- y
 cfa_df$주관적만족감 <- as.factor(ifelse(cfa_df$주관적만족감 >=3, "만족", "불만족"))
 cfa_df$주관적만족감 <- fct_rev(cfa_df$주관적만족감)
-saveRDS(cfa_df, file="./cfa_jt_total.rda") # Phase 1
-# saveRDS(cfa_df, file="./cfa_jt_y.rda") # Phase 2
-# saveRDS(ca_df, file="./cfa_jt_n.rda") # Phase 3
+saveRDS(cfa_df, file="./cfa_total.rda") # Phase 1
+# saveRDS(cfa_df, file="./cfa_y.rda") # Phase 2
+# saveRDS(ca_df, file="./cfa_n.rda") # Phase 3
 ################################################################################
